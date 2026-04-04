@@ -18,6 +18,10 @@ def weather(station_id='KMAHANOV10'):
     if response.ok:
         payload = response.json()
         observation = payload['observations'][0]
+
+
+
+
         return {
             'heatIndex': f"{observation['imperial']['heatIndex']}f",
             'windChill': f"{observation['imperial']['windChill']}f",
