@@ -2,12 +2,14 @@ import requests
 from flask import Flask
 
 from constants import WEATHER_API_KEY
+from tasks.celery import hello
 
 app = Flask(__name__)
 
 @app.route('/', methods=['GET'])
 def hello_world():  # put application's code here
-    return 'Hello World!'
+    hello.delay()
+    return 'Hello World'
 
 @app.route('/weather/<station_id>', methods=['GET'])
 def weather(station_id='KMAHANOV10'):

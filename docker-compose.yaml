@@ -3,3 +3,10 @@ services:
     image: redis:alpine
     ports:
       - 6379:6379
+#  celery:
+#    build: ./celery/
+#    environment:
+#      - REDIS_HOST=${REDIS_HOST}
+#      - REDIS_PORT=${REDIS_PORT}
+#    ports:
+#      - 5672:5672
