@@ -1,6 +1,6 @@
 import unittest
 
-from db import Database
+from api.models.db import Database
 
 class TestDatabase(unittest.TestCase):
     def test_save_Fetch(self):

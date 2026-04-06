@@ -2,7 +2,8 @@ import requests
 from flask import Flask
 
 from constants import WEATHER_API_KEY
-from tasks.celery import hello
+from models.WeatherObservation import WeatherObservation
+from tasks.celery import save_observation, hello
 
 app = Flask(__name__)
 
@@ -21,17 +22,18 @@ def weather(station_id='KMAHANOV10'):
         payload = response.json()
         observation = payload['observations'][0]
 
-
-
-
-        return {
+        data = {
             'heatIndex': f"{observation['imperial']['heatIndex']}f",
             'windChill': f"{observation['imperial']['windChill']}f",
             'temp': f"{observation['imperial']['temp']}f",
             'humidity': observation['humidity'],
             "obsTimeLocal": observation['obsTimeLocal'],
-            "stationID": observation['stationID']
+            "stationId": observation['stationID']
         }
+        weatherObservation = WeatherObservation(**data)
+        save_observation(weatherObservation.pk, weatherObservation.serialize())
+        return data
+
     else:
         print(response.content)
 

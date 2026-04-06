@@ -1,4 +1,4 @@
-from db import Database
+from models.db import Database
 
 
 class DatabaseModel:
@@ -14,14 +14,9 @@ class DatabaseModel:
             self._data = response_data
         else:
             self.save()
-
-        self.deserialize()
         return self
 
-    def deserialize(self):
-        raise NotImplementedError
-
-    def serialize(self):
+    def serialize(self) -> str:
         raise NotImplementedError
 
 

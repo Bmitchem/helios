@@ -1,6 +1,6 @@
 import redis
 import json
-from constants import REDIS_URL, REDIS_PORT
+from constants import REDIS_HOST, REDIS_PORT
 
 
 class Database:
@@ -9,7 +9,7 @@ class Database:
         self.connect()
 
     def connect(self):
-        self.redis_db = redis.Redis(host=REDIS_URL, port=REDIS_PORT, db=0)
+        self.redis_db = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=1)
 
     def save(self, pk, data):
         self.redis_db.set(pk, json.dumps(data))

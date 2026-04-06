@@ -2,8 +2,10 @@ import unittest
 
 from pydantic_core import ValidationError
 
-from models.WeatherObservation import WeatherObservation
 from faker import Faker
+
+from models.WeatherObservation import WeatherObservation
+
 
 def generateObservation():
     """
@@ -58,6 +60,16 @@ class WeatherObservationTests(unittest.TestCase):
         with self.assertRaises(ValidationError):
             WeatherObservation(**testData)
 
+    def test_serialize(self):
+        testData = generateObservation()
+        observation = WeatherObservation(**testData)
+        serialized_data = observation.serialize()
+        assert isinstance(serialized_data, str)
+
+    def test_pk(self):
+        testData = generateObservation()
+        observation = WeatherObservation(**testData)
+        assert isinstance(observation.pk, str)
 
 if __name__ == '__main__':
     unittest.main()
