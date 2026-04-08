@@ -27,7 +27,11 @@ def hello():
 @app.task
 def save_observation(pk: str, observation: str):
     db = Database()
-
-
     db.save(pk, observation)
+    return pk
+
+@app.task
+def save_station(pk: str, station: str):
+    db = Database()
+    db.save(pk, station)
     return pk

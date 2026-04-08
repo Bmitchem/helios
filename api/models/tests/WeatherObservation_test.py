@@ -10,23 +10,22 @@ from models.WeatherObservation import WeatherObservation
 def generateObservation():
     """
         example api output {
-          "heatIndex": "35f",
+          "heatIndex": 35,
           "humidity": 80,
           "obsTimeLocal": "2026-04-04 16:47:27",
           "stationID": "KMAHANOV10",
-          "temp": "35f",
-          "windChill": "30f"
+          "temp": 35,
+          "windChill": 30
         }
 
     :return:
     """
     fake = Faker()
-    scale = fake.random_element(elements=['c','f'])
     return {
-        "heatIndex":f"{fake.random_number(digits=2)}{scale}",
-        "windChill":f"{fake.random_number(digits=2)}{scale}",
-        "temp":f"{fake.random_number(digits=2)}{scale}",
-        "humidity":f"{fake.random_number(digits=2)}",
+        "heatIndex":fake.random_number(digits=2),
+        "windChill":fake.random_number(digits=2),
+        "temp":fake.random_number(digits=2),
+        "humidity":fake.random_number(digits=2),
         "obsTimeLocal":f"{fake.date('%Y-%m-%d %H:%M:%S')}",
         "stationId":f"{fake.uuid4()}",
     }
@@ -36,21 +35,21 @@ class WeatherObservationTests(unittest.TestCase):
         testData = generateObservation()
         assert WeatherObservation(**testData)
 
-    def test_heatIndex_int_throws_error(self):
+    def test_heatIndex_str_throws_error(self):
         testData = generateObservation()
-        testData['heatIndex'] = 0
+        testData['heatIndex'] = "0f"
         with self.assertRaises(ValidationError):
             WeatherObservation(**testData)
 
-    def test_windChill_int_throws_error(self):
+    def test_windChill_str_throws_error(self):
         testData = generateObservation()
-        testData['windChill'] = 0
+        testData['windChill'] = "0f"
         with self.assertRaises(ValidationError):
             WeatherObservation(**testData)
 
-    def test_temp_int_throws_error(self):
+    def test_temp_str_throws_error(self):
         testData = generateObservation()
-        testData['temp'] = 0
+        testData['temp'] = "0f"
         with self.assertRaises(ValidationError):
             WeatherObservation(**testData)
 
@@ -64,7 +63,7 @@ class WeatherObservationTests(unittest.TestCase):
         testData = generateObservation()
         observation = WeatherObservation(**testData)
         serialized_data = observation.serialize()
-        assert isinstance(serialized_data, str)
+        assert isinstance(serialized_data, dict)
 
     def test_pk(self):
         testData = generateObservation()
