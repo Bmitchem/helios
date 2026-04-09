@@ -18,10 +18,10 @@ class Database:
         self.dbName = dbName
 
     def connect(self):
+        print(f'Connecting to redis: {REDIS_HOST}:{REDIS_PORT}')
         self.redis_db = redis.Redis(
             host=REDIS_HOST,
             port=REDIS_PORT,
-            db=self.dbName,
             decode_responses=True
         )
 
@@ -38,17 +38,18 @@ class Database:
         data = self.redis_db.delete(pk)
         return data is None
 
-    def search(self, prefix:str, searchQuery: list[SearchParam]):
+    def search(self, prefix:str, searchQuery: list):
         matchedItems = []
 
         for dbKey in filter(lambda item: prefix in item, self.redis_db.scan_iter()):
             databaseObject = self.fetch(dbKey)
             matched = True
-            for query in searchQuery:
-                keyword = query['key']
-                keyValue = query['value']
-                if databaseObject.get(keyword) != keyValue:
-                    matched = False
+            if searchQuery:
+                for query in searchQuery:
+                    keyword = query['key']
+                    keyValue = query['value']
+                    if databaseObject.get(keyword) != keyValue:
+                        matched = False
             if matched:
                 matchedItems.append(databaseObject)
         return matchedItems

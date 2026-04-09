@@ -39,3 +39,16 @@ services:
       timeout: 3s
       retries: 5
       start_period: 10s
+  celery-beat:
+    image: celery-worker:latest
+    depends_on:
+      redis:
+        condition: service_healthy
+      celery-worker-1:
+        condition: service_started
+      celery-worker-2:
+        condition: service_started
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=${REDIS_PORT}
+    command: [ "celery", "--app=tasks", "beat", "-l", "INFO" ]

@@ -2,12 +2,10 @@ import base64
 import logging
 from datetime import datetime
 from pydantic import BaseModel
-import requests
 
 from models.db import Database
-from models.utils import roundToNearestFiveMinutes, convertKelvinToFahrenheit, convertKelvinToCelsius, convertFtoK
-from constants import WEATHER_API_KEY
-from tasks.celery import save_observation
+from models.utils import roundToNearestFiveMinutes, convertKelvinToFahrenheit, convertKelvinToCelsius, convertFtoK, \
+    fetchWeatherObservation
 
 logger = logging.getLogger(__name__)
 
@@ -64,26 +62,14 @@ class WeatherObservation(BaseModel):
         observation = WeatherObservation.fetchObservation(stationId)
         serializedData = observation.serialize()
         logging.info(f'Saving cached document({pk})')
-        save_observation(pk, serializedData)
+        from tasks.celery import save_observation
+        save_observation.s(pk, serializedData)
         return serializedData
 
     @staticmethod
     def fetchObservation(stationId: str):
-        REQUEST_URL = f'https://api.weather.com/v2/pws/observations/current?stationId={stationId}&format=json&units=e&apiKey={WEATHER_API_KEY}'
-        response = requests.get(REQUEST_URL)
-        if response.ok:
-            payload = response.json()
-            observation = payload['observations'][0]
-
-            data = {
-                'heatIndex': convertFtoK(observation['imperial']['heatIndex']),
-                'windChill': convertFtoK(observation['imperial']['windChill']),
-                'temp': convertFtoK(observation['imperial']['temp']),
-                'humidity': observation['humidity'],
-                "obsTimeLocal": observation['obsTimeLocal'],
-                "stationId": observation['stationID']
-            }
-            return WeatherObservation(**data)
+        data = fetchWeatherObservation(stationId)
+        return WeatherObservation(**data)
 
     @staticmethod
     def localize(observation: dict, unit: str) -> dict:

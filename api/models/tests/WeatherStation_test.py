@@ -30,5 +30,6 @@ class WeatherStationTests(unittest.TestCase):
         testData = generateStation()
         assert WeatherStation(**testData)
 
+
 if __name__ == '__main__':
     unittest.main()

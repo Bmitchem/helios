@@ -2,8 +2,7 @@ from datetime import datetime
 from typing import Optional
 
 from pydantic import BaseModel
-
-from tasks.celery import save_station
+from models.utils import listWeatherStations
 
 
 class WeatherStation(BaseModel):
@@ -27,4 +26,9 @@ class WeatherStation(BaseModel):
         return f'weather-station-{stationId}'
 
     def save(self):
-        save_station(self.pk, self.serialize())
+        from tasks.celery import save_station
+        save_station.s(self.pk, self.serialize())
+
+    @staticmethod
+    def list():
+        return listWeatherStations()
